@@ -1,4 +1,4 @@
-name: Shared Workflow
+name: Release adaptor container image
 
 on:
   workflow_call:
