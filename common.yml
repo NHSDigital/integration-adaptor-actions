@@ -9,7 +9,12 @@ on:
       folder:
         required: true
         type: string
-
+      repo:
+        required: true
+        type: string
+      ref_name:
+        required: true
+        type: string
 jobs:
   reusable_workflow_job:
     name: Push Docker image
@@ -30,7 +35,7 @@ jobs:
           flavor: |
             latest=false
           labels: |
-            org.opencontainers.image.source=https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/docker/${{ inputs.folder }}/Dockerfile
+            org.opencontainers.image.source=https://github.com/${{ inputs.repository }}/blob/${{ inputs.ref_name }}/docker/${{ inputs.folder }}/Dockerfile
       - name: Log in to the Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
