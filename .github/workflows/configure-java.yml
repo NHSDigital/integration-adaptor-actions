@@ -1,0 +1,39 @@
+name: Configure Java
+on:
+  workflow_call:
+    inputs:
+      java-version:
+        description: 'The Java version to set up'
+        required: true
+        type: string
+      jdk-distribution:
+        description: 'The JDK distribution to use, the default is temurin'
+        type: string
+        default: 'temurin'
+      repository:
+        description: 'The repository to checkout'
+        required: true
+        type: string
+      ref:
+        description: 'The branch or ref to checkout'
+        required: true
+        type: string
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.repository }}
+          ref: ${{ inputs.ref }}
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ inputs.java-version }}
+          distribution: ${{ inputs.jdk-distribution }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
