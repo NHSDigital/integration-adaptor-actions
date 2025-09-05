@@ -16,12 +16,37 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+
+      - name: Make the SBOM script executable
+        run: chmod +x ./scripts/sbom-generator.sh
+
+      - name: Run the shell script
+        run: ./scripts/sbom-generator.sh
+
+      - name: Collect Artifacts
+        run: |
+          mkdir -p artifacts
+          cp -r ./sbom-spdx.json ./artifacts
+          ls ./artifacts
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./artifacts/sbom-spdx.json
+          asset_name: sbom-spdx.json
+          asset_content_type: application/json
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f #v5.8.0
         with:
           images: |
             nhsdev/${{ inputs.dockerhub_name }}
@@ -31,13 +56,15 @@ jobs:
             latest=false
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/docker/${{ inputs.folder }}/Dockerfile
+
       - name: Log in to the Container registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 #v3.5.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Build and push Docker images
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83  #v6.18.0
         with:
           context: .
           file: docker/${{ inputs.folder }}/Dockerfile
