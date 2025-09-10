@@ -33,7 +33,7 @@ jobs:
       - name: Collect Artifacts
         run: |
           mkdir -p artifacts
-          cp -r ./sbom-spdx.json ./artifacts
+          cp -r ./sbom-spdx.json ./artifacts/${{ inputs.dockerhub_name }}-sbom-spdx.json
           ls ./artifacts
 
       - name: Upload Release Asset
@@ -43,8 +43,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ inputs.upload_url }}
-          asset_path: ./artifacts/sbom-spdx.json
-          asset_name: sbom-spdx.json
+          asset_path: ./artifacts/${{ inputs.dockerhub_name }}-sbom-spdx.json
+          asset_name: ${{ inputs.dockerhub_name }}-sbom-spdx.json
           asset_content_type: application/json
 
       - name: Extract metadata (tags, labels) for Docker
